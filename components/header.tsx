@@ -87,7 +87,7 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 focus:outline-none focus:ring-0 focus-visible:ring-0">
+          <Link href="/" className="flex items-center space-x-2 focus-no-scroll">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">U</span>
             </div>
