@@ -2,82 +2,10 @@
 
 import { useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Smartphone, Car, Home, Shirt, Gamepad2, Book, Dumbbell, Baby, Heart, Truck, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-
-const categories = [
-  {
-    name: "Electronics",
-    icon: Smartphone,
-    count: "125K+ items",
-    color: "from-blue-500 to-cyan-500",
-    href: "/category/electronics",
-  },
-  {
-    name: "Vehicles",
-    icon: Car,
-    count: "45K+ items",
-    color: "from-red-500 to-pink-500",
-    href: "/category/vehicles",
-  },
-  {
-    name: "Home & Garden",
-    icon: Home,
-    count: "89K+ items",
-    color: "from-green-500 to-emerald-500",
-    href: "/category/home-garden",
-  },
-  {
-    name: "Fashion",
-    icon: Shirt,
-    count: "67K+ items",
-    color: "from-purple-500 to-violet-500",
-    href: "/category/fashion",
-  },
-  {
-    name: "Gaming",
-    icon: Gamepad2,
-    count: "23K+ items",
-    color: "from-orange-500 to-yellow-500",
-    href: "/category/gaming",
-  },
-  {
-    name: "Books",
-    icon: Book,
-    count: "34K+ items",
-    color: "from-indigo-500 to-blue-500",
-    href: "/category/books",
-  },
-  {
-    name: "Sports",
-    icon: Dumbbell,
-    count: "19K+ items",
-    color: "from-teal-500 to-green-500",
-    href: "/category/sports",
-  },
-  {
-    name: "Baby & Kids",
-    icon: Baby,
-    count: "28K+ items",
-    color: "from-pink-500 to-rose-500",
-    href: "/category/baby-kids",
-  },
-  {
-    name: "Donate/Giveaway",
-    icon: Heart,
-    count: "5K+ items",
-    color: "from-emerald-500 to-green-500",
-    href: "/category/donate-giveaway",
-  },
-  {
-    name: "Moving Out",
-    icon: Truck,
-    count: "3K+ items",
-    color: "from-red-500 to-orange-500",
-    href: "/category/moving-out",
-  },
-]
+import { categories } from "@/lib/products" // Import categories from lib/products
 
 export default function FeaturedCategories() {
   const router = useRouter()
@@ -101,13 +29,16 @@ export default function FeaturedCategories() {
     // Preserve scroll position
     const currentScroll = window.pageYOffset || document.documentElement.scrollTop
 
-    router.push("/categories")
+    router.push("/categories", { scroll: false }) // Ensure scroll: false is passed
 
     // Restore scroll position
     setTimeout(() => {
       window.scrollTo({ top: currentScroll, behavior: "auto" })
     }, 0)
   }, [router])
+
+  // Filter categories to only show the first 8 for the featured section
+  const featuredCategories = categories.slice(0, 8)
 
   return (
     <section className="py-16 lg:py-24 bg-white dark:bg-gray-900">
@@ -120,7 +51,7 @@ export default function FeaturedCategories() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
-          {categories.map((category, index) => {
+          {featuredCategories.map((category, index) => {
             const IconComponent = category.icon
             return (
               <Card

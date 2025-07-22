@@ -17,6 +17,7 @@ import {
   Eye,
   Flag,
   Phone,
+  Edit,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -64,6 +65,7 @@ export default function ListingPage({ params }: { params: { id: string } }) {
   }
 
   const images = [listing.image, listing.image, listing.image, listing.image] // Mock multiple images
+  const isSeller = state.user?.name === listing.seller.name
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length)
@@ -131,6 +133,10 @@ export default function ListingPage({ params }: { params: { id: string } }) {
       title: "Contact Number",
       description: "Call +91 98765 43210 to speak with the seller directly.",
     })
+  }
+
+  const handleEditListing = () => {
+    router.push(`/sell?id=${listing.id}`)
   }
 
   // Get special badge for product
@@ -357,45 +363,57 @@ export default function ListingPage({ params }: { params: { id: string } }) {
 
                 <Separator className="my-6" />
 
-                {/* Contact Buttons */}
-                <div className="space-y-3">
+                {/* Contact Buttons or Edit Button */}
+                {isSeller ? (
                   <Button
-                    onClick={handleContactSeller}
+                    onClick={handleEditListing}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   >
-                    <MessageCircle className="h-5 w-5 mr-2" />
-                    {listing.category === "donate-giveaway" ? "Request Item" : "Chat with Seller"}
+                    <Edit className="h-5 w-5 mr-2" />
+                    Edit Listing
                   </Button>
-                  <Button
-                    onClick={handleCallSeller}
-                    variant="outline"
-                    className="w-full bg-transparent hover:bg-green-50 hover:border-green-300"
-                  >
-                    <Phone className="h-5 w-5 mr-2" />
-                    Call Seller
-                  </Button>
-                </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Button
+                      onClick={handleContactSeller}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      {listing.category === "donate-giveaway" ? "Request Item" : "Chat with Seller"}
+                    </Button>
+                    <Button
+                      onClick={handleCallSeller}
+                      variant="outline"
+                      className="w-full bg-transparent hover:bg-green-50 hover:border-green-300"
+                    >
+                      <Phone className="h-5 w-5 mr-2" />
+                      Call Seller
+                    </Button>
+                  </div>
+                )}
 
                 <Separator className="my-6" />
 
                 {/* Quick Message */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Send a Message</label>
-                  <Textarea
-                    placeholder={
-                      listing.category === "donate-giveaway"
-                        ? "Hi! I'm interested in this free item. Is it still available?"
-                        : "Hi! Is this item still available?"
-                    }
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="mb-3"
-                    rows={3}
-                  />
-                  <Button variant="outline" className="w-full bg-transparent" onClick={handleContactSeller}>
-                    Send Message
-                  </Button>
-                </div>
+                {!isSeller && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Send a Message</label>
+                    <Textarea
+                      placeholder={
+                        listing.category === "donate-giveaway"
+                          ? "Hi! I'm interested in this free item. Is it still available?"
+                          : "Hi! Is this item still available?"
+                      }
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="mb-3"
+                      rows={3}
+                    />
+                    <Button variant="outline" className="w-full bg-transparent" onClick={handleContactSeller}>
+                      Send Message
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

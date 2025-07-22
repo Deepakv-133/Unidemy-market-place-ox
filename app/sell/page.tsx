@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Upload, X, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,13 +13,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useApp } from "@/lib/store"
 import { useToast } from "@/hooks/use-toast"
-import { addProduct } from "@/lib/products"
+import { addProduct, getProductById, updateProduct, categories } from "@/lib/products"
 import Link from "next/link"
 
 export default function SellPage() {
   const { state } = useApp()
   const { toast } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const editingProductId = searchParams.get("id")
 
   const [formData, setFormData] = useState({
     title: "",
@@ -33,6 +35,33 @@ export default function SellPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+
+  useEffect(() => {
+    if (editingProductId) {
+      const product = getProductById(Number.parseInt(editingProductId))
+      if (product) {
+        setIsEditing(true)
+        setFormData({
+          title: product.title,
+          description: product.description,
+          price: product.price.toString(),
+          originalPrice: product.originalPrice?.toString() || "",
+          category: product.category,
+          condition: product.condition,
+          location: product.location,
+          images: product.image ? [product.image] : [], // Assuming single image for simplicity
+        })
+      } else {
+        toast({
+          title: "Product not found",
+          description: "The product you are trying to edit does not exist.",
+          variant: "destructive",
+        })
+        router.replace("/sell") // Redirect to new listing page
+      }
+    }
+  }, [editingProductId, router, toast])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -99,8 +128,8 @@ export default function SellPage() {
     setIsSubmitting(true)
 
     try {
-      // Create the product
-      const newProduct = addProduct({
+      let productResult
+      const commonProductData = {
         title: formData.title,
         description: formData.description,
         price: formData.category === "donate-giveaway" ? 0 : Number.parseFloat(formData.price),
@@ -119,21 +148,32 @@ export default function SellPage() {
           Condition: formData.condition,
           Category: formData.category,
         },
-      })
+      }
 
-      toast({
-        title: "Listing created successfully!",
-        description:
-          formData.category === "donate-giveaway"
-            ? "Your donation has been listed and will help someone in need!"
-            : "Your item has been listed and is now live on the marketplace.",
-      })
+      if (isEditing && editingProductId) {
+        productResult = updateProduct(Number.parseInt(editingProductId), commonProductData)
+        toast({
+          title: "Listing updated successfully!",
+          description: "Your item details have been updated.",
+        })
+      } else {
+        productResult = addProduct(commonProductData)
+        toast({
+          title: "Listing created successfully!",
+          description:
+            formData.category === "donate-giveaway"
+              ? "Your donation has been listed and will help someone in need!"
+              : "Your item has been listed and is now live on the marketplace.",
+        })
+      }
 
-      // Redirect to the new product page
-      router.push(`/listing/${newProduct.id}`)
+      // Redirect to the new/updated product page
+      if (productResult) {
+        router.push(`/listing/${productResult.id}`)
+      }
     } catch (error) {
       toast({
-        title: "Error creating listing",
+        title: `Error ${isEditing ? "updating" : "creating"} listing`,
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       })
@@ -172,13 +212,13 @@ export default function SellPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center mb-8">
-          <Link href="/dashboard">
+          <Link href={isEditing ? `/listing/${editingProductId}` : "/dashboard"}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              {isEditing ? "Back to Listing" : "Back to Dashboard"}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold ml-4">Create New Listing</h1>
+          <h1 className="text-3xl font-bold ml-4">{isEditing ? "Edit Listing" : "Create New Listing"}</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
@@ -224,16 +264,11 @@ export default function SellPage() {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="electronics">Electronics</SelectItem>
-                          <SelectItem value="vehicles">Vehicles</SelectItem>
-                          <SelectItem value="home-garden">Home & Garden</SelectItem>
-                          <SelectItem value="fashion">Fashion</SelectItem>
-                          <SelectItem value="gaming">Gaming</SelectItem>
-                          <SelectItem value="books">Books</SelectItem>
-                          <SelectItem value="sports">Sports</SelectItem>
-                          <SelectItem value="baby-kids">Baby & Kids</SelectItem>
-                          <SelectItem value="donate-giveaway">Donate/Giveaway</SelectItem>
-                          <SelectItem value="moving-out">Moving Out</SelectItem>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.slug} value={cat.slug}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -428,10 +463,14 @@ export default function SellPage() {
                 className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {isSubmitting
-                  ? "Creating Listing..."
-                  : formData.category === "donate-giveaway"
-                    ? "List for Donation"
-                    : "Create Listing"}
+                  ? isEditing
+                    ? "Updating Listing..."
+                    : "Creating Listing..."
+                  : isEditing
+                    ? "Update Listing"
+                    : formData.category === "donate-giveaway"
+                      ? "List for Donation"
+                      : "Create Listing"}
               </Button>
             </div>
           </div>

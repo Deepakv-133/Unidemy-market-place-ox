@@ -14,19 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useApp } from "@/lib/store"
 import { ThemeToggle } from "./theme-toggle"
-
-const categories = [
-  { name: "Electronics", slug: "electronics" },
-  { name: "Vehicles", slug: "vehicles" },
-  { name: "Home & Garden", slug: "home-garden" },
-  { name: "Fashion", slug: "fashion" },
-  { name: "Gaming", slug: "gaming" },
-  { name: "Books", slug: "books" },
-  { name: "Sports", slug: "sports" },
-  { name: "Baby & Kids", slug: "baby-kids" },
-  { name: "Donate/Giveaway", slug: "donate-giveaway" },
-  { name: "Moving Out", slug: "moving-out" },
-]
+import { categories } from "@/lib/products" // Import categories from lib/products
 
 export default function Header() {
   const { state, dispatch } = useApp()
@@ -87,7 +75,7 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 focus-no-scroll">
+          <Link href="/" className="flex items-center space-x-2 focus:outline-none focus:ring-0 focus-visible:ring-0">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">U</span>
             </div>

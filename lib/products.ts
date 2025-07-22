@@ -1,4 +1,19 @@
 import type { Product } from "@/lib/store"
+import {
+  Smartphone,
+  Car,
+  Home,
+  Shirt,
+  Gamepad2,
+  BookOpen,
+  Dumbbell,
+  Baby,
+  Gift,
+  Truck,
+  Camera,
+  Music,
+  Wrench,
+} from "lucide-react"
 
 // Mock product database - in a real app, this would be a proper database
 const products: Product[] = [
@@ -317,6 +332,135 @@ export function addProduct(product: Omit<Product, "id">): Product {
   return newProduct
 }
 
+export function updateProduct(id: number, updatedFields: Partial<Omit<Product, "id">>): Product | undefined {
+  const productIndex = products.findIndex((p) => p.id === id)
+  if (productIndex > -1) {
+    products[productIndex] = { ...products[productIndex], ...updatedFields }
+    return products[productIndex]
+  }
+  return undefined
+}
+
 export function getProductsBySeller(sellerName: string): Product[] {
   return products.filter((product) => product.seller.name === sellerName)
 }
+
+export const categories = [
+  {
+    name: "Electronics",
+    slug: "electronics",
+    description: "Phones, laptops, cameras, and other gadgets",
+    count: "125K+ items",
+    icon: Smartphone,
+    color: "from-blue-500 to-blue-600",
+    href: "/category/electronics",
+  },
+  {
+    name: "Vehicles",
+    slug: "vehicles",
+    description: "Cars, motorcycles, bicycles, and parts",
+    count: "45K+ items",
+    icon: Car,
+    color: "from-green-500 to-green-600",
+    href: "/category/vehicles",
+  },
+  {
+    name: "Home & Garden",
+    slug: "home-garden",
+    description: "Furniture, decor, appliances, and outdoor items",
+    count: "89K+ items",
+    icon: Home,
+    color: "from-purple-500 to-purple-600",
+    href: "/category/home-garden",
+  },
+  {
+    name: "Fashion",
+    slug: "fashion",
+    description: "Clothing, shoes, accessories, and jewelry",
+    count: "1680 items",
+    icon: Shirt,
+    color: "from-purple-500 to-purple-600",
+    href: "/category/fashion",
+  },
+  {
+    name: "Books & Media",
+    slug: "books-media",
+    description: "Books, movies, music, and educational materials",
+    count: "750 items",
+    icon: BookOpen,
+    color: "from-orange-500 to-orange-600",
+    href: "/category/books-media",
+  },
+  {
+    name: "Gaming",
+    slug: "gaming",
+    description: "Video games, consoles, and gaming accessories",
+    count: "420 items",
+    icon: Gamepad2,
+    color: "from-indigo-500 to-indigo-600",
+    href: "/category/gaming",
+  },
+  {
+    name: "Baby & Kids",
+    slug: "baby-kids",
+    description: "Baby gear, toys, kids clothing, and furniture",
+    count: "980 items",
+    icon: Baby,
+    color: "from-pink-500 to-pink-600",
+    href: "/category/baby-kids",
+  },
+  {
+    name: "Sports & Fitness",
+    slug: "sports-fitness",
+    description: "Exercise equipment, sports gear, and outdoor items",
+    count: "380 items",
+    icon: Dumbbell,
+    color: "from-teal-500 to-teal-600",
+    href: "/category/sports-fitness",
+  },
+  {
+    name: "Tools & Hardware",
+    slug: "tools-hardware",
+    description: "Power tools, hand tools, and hardware supplies",
+    count: "250 items",
+    icon: Wrench,
+    color: "from-gray-500 to-gray-600",
+    href: "/category/tools-hardware",
+  },
+  {
+    name: "Photography",
+    slug: "photography",
+    description: "Cameras, lenses, lighting, and photo equipment",
+    count: "320 items",
+    icon: Camera,
+    color: "from-orange-500 to-orange-600",
+    href: "/category/photography",
+  },
+  {
+    name: "Music & Instruments",
+    slug: "music-instruments",
+    description: "Musical instruments, audio equipment, and accessories",
+    count: "280 items",
+    icon: Music,
+    color: "from-purple-500 to-purple-600",
+    href: "/category/music-instruments",
+  },
+  {
+    name: "Donate/Giveaway",
+    slug: "donate-giveaway",
+    description: "Free items being given away by generous community members",
+    count: "450 items",
+    icon: Gift,
+    color: "from-emerald-500 to-green-500",
+    href: "/category/donate-giveaway",
+  },
+  {
+    name: "Moving Out",
+    slug: "moving-out",
+    description: "Urgent sales from people relocating - great deals available",
+    count: "180 items",
+    icon: Truck,
+    color: "from-red-500 to-orange-500",
+    href: "/category/moving-out",
+  },
+]
